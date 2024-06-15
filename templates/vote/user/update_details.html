@@ -1,0 +1,134 @@
+{% extends 'vote/user/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Update Details</title>
+{% endblock %}
+
+{% block body_block %}
+    <div class="parent2">
+        <div class="title2">
+            Update Details
+        </div>
+
+        <div class="content2">
+            <div>
+                Kindly ensure that all details filled below are correct and accurate.
+            </div>
+        </div>
+        <div class="content2">
+            <div>
+                Please note that providing false information is a crime punishable by law.
+            </div>
+        </div>
+        <div class="formWrapper">
+            <div class="form">
+                <p>Personal Details</p>
+                <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                    <div class="fieldWrapper_group">
+                        <div class="fieldWrapper2">
+                            <label for="id_serial_number">ID Serial Number</label>
+                            <input class="input" type="text" name="id_serial_number" maxlength="10" id="id_serial_number" value="{{voter.id_serial_number}}" readonly>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="fieldWrapper2">
+                            <label for="first_name">First Name</label>
+                            <input class="input" type="text" name="first_name" maxlength="254" id="first_name" value="{{voter.first_name}}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper_group">
+                        <div class="fieldWrapper2">
+                            <label for="middle_name">Middle Name</label>
+                            <input class="input" type="text" name="middle_name" maxlength="254" id="middle_name" value="{{voter.middle_name}}" readonly>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="fieldWrapper2">
+                            <label for="last_name">Last Name</label>
+                            <input class="input" type="text" name="last_name" maxlength="254" id="last_name" value="{{voter.surname}}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper_group">
+                        <div class="fieldWrapper2">
+                            <label for="phone_number">Phone Number</label>
+                            <input class="input" type="text" name="phone_number" maxlength="10" id="phone_number" value="{{voter.phone_number}}" required>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="fieldWrapper2">
+                            <label for="gender">Gender</label>
+                            <input class="input" type="text" name="gender" maxlength="10" id="gender" value="{{voter.gender}}" readonly>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div class="formWrapper">
+            <div class="form">
+                <p>Location Details</p>
+                    <div class="fieldWrapper_group">
+                        <div class="fieldWrapper2">
+                            <label for="county">County</label>
+                            <select class="input" name="county" id="county" required>
+                                <option value="{{ voter.ward_code.constituency_code.county_code }}" selected="selected"> {{ voter.ward_code.constituency_code.county_code }} </option>
+                            </select>
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="fieldWrapper2">
+                            <label for="constituency">Constituency</label>
+                            <select class="input" name="constituency" id="constituency" required="">
+                                <option value="{{ voter.ward_code.constituency_code}}" selected="selected"> {{ voter.ward_code.constituency_code}} </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper_group">
+                        <div class="fieldWrapper2">
+                            <label for="ward_code">Ward</label>
+                            <select class="input" name="ward_code" id="ward_code" required="">
+                                <option value="{{ voter.ward_code_id }}" selected="selected">{{ voter.ward_code }}</option>
+                            </select>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+        <div class="formWrapper">
+            <div class="form">
+                <div class="fieldWrapper">
+                    <label for="image">Photo</label>
+                    <input type="file" class="input" name="image" id="image" accept="image/*" onchange="loadFile(event)" value="Add Photo">
+                    <img id="output" src="{{ voter.photo.url }}" alt="Loading..."/>
+                    <span>To Reset picture kindly refresh the page</span>
+                </div>
+            </div>
+        </div>
+
+                <div class="button-parent">
+                    <div class="button-group2">
+                        <a class="submit" href={% url 'vote:index' %}>BACK</a>
+                        <input id="submit2" type="submit" value="SUBMIT DETAILS"/>
+                    </div>
+                </div>
+                </form>
+            </div>
+
+    <script>
+        var loadFile = function(event) {
+            var output = document.getElementById('output');
+            output.src = URL.createObjectURL(event.target.files[0]);
+            output.onload = function() {
+            URL.revokeObjectURL(output.src) // free memory
+            }
+        };
+    </script>
+
+{% endblock %}
+

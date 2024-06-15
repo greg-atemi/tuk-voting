@@ -1,0 +1,21 @@
+{% extends 'vote/admin/../auth/auth_base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Logout</title>
+{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+
+{% block body_block %}
+    <body>
+        <div class="form-narrow">
+            <form>
+                <h1>YOU HAVE BEEN LOGGED OUT SUCCESSFULLY!</h1>
+                <div class="button-container">
+                    <a class="submit" href={% url 'vote:' %}> LOGIN </a>
+                    <a class="submit2" href={% url 'vote:signup' %}> SIGNUP </a>
+                </div>
+            </form>
+        </div>
+    </body>
+{% endblock %}

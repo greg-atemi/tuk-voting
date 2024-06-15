@@ -1,0 +1,29 @@
+{% extends 'vote/user/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Success</title>
+{% endblock %}
+
+{% block body_block %}
+    <div class="parent">
+        <div class="title">
+            SUCCESS!
+        </div>
+
+        <div class="content">
+            You have been successfully registered into the National Voting Roll.
+        </div>
+        <div class="content">
+            For more details about the voting process visit https://iebc.gov.ke
+        </div>
+        <div class="content">
+            Good luck in the election
+        </div>
+        <div class="button-container">
+            <a class="submit2" href="/vote">
+                BACK TO HOME SCREEN
+            </a>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'vote/user/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Bio Data</title>
+{% endblock %}
+
+{% block body_block %}
+    <div class="parent2">
+        <div class="title">
+            Step 1 of 4: Personal Information
+        </div>
+        <div class="stepper">
+            <img class="icon" src="{% static 'images/current.svg' %}" alt="current">
+            <div class="separator"></div>
+            <img class="icon" src="{% static 'images/circle.svg' %}" alt="circle">
+            <div class="separator"></div>
+            <img class="icon" src="{% static 'images/circle.svg' %}" alt="circle">
+            <div class="separator"></div>
+            <img class="icon" src="{% static 'images/circle.svg' %}" alt="circle">
+        </div>
+
+        <div class="content">
+            Kindly fill up the following fields as correctly and accurately as possible.
+        </div>
+        <div class="content">
+            Please note that providing false information is a crime punishable by law.
+        </div>
+        <div class="formWrapper">
+            <div class="form">
+                <form action="" method="post">
+                {% csrf_token %}
+                    <div class="fieldWrapper">
+                        <label for="id_serial_number">ID Serial Number</label>
+                        <input class="input" type="text" name="id_serial_number" maxlength="9" id="id_serial_number" required>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        <label for="first_name">First Name</label>
+                        <input class="input" type="text" name="first_name" maxlength="254" id="first_name" required>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        <label for="middle_name">Middle Name</label>
+                        <input class="input" type="text" name="middle_name" maxlength="254" id="middle_name" required>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        <label for="surname">Surname</label>
+                        <input class="input" type="text" name="surname" maxlength="254" id="surname" required>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        <label for="gender">Gender</label>
+                        <select class="input" name="gender" id="gender" required>
+                            <option value="" selected=""></option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="fieldWrapper">
+                        <label for="phone_number">Phone Number</label>
+                        <input class="input" type="text" name="phone_number" maxlength="10" id="phone_number" required>
+                    </div>
+
+                    <div class="button-group">
+                        <input type="reset" class="submit" value="CLEAR">
+                        <input id="submit2" type="submit" value="NEXT"/>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{#<a href={% url 'vote:location' %}>NEXT</a>#}
+{#<a id="button5" href="{% url 'vote:location' Voter.email %}">NEXT</a>#}
+{% endblock %}
