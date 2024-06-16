@@ -29,8 +29,8 @@
                 {% csrf_token %}
                     <div class="fieldWrapper_group">
                         <div class="fieldWrapper2">
-                            <label for="id_serial_number">ID Serial Number</label>
-                            <input class="input" type="text" name="id_serial_number" maxlength="10" id="id_serial_number" value="{{voter.id_serial_number}}" readonly>
+                            <label for="registration_number">Registration Number</label>
+                            <input class="input" type="text" name="registration_number" maxlength="10" id="registration_number" value="{{voter.registration_number}}" readonly>
                         </div>
 
                         <div class="spacer"></div>
@@ -43,8 +43,8 @@
 
                     <div class="fieldWrapper_group">
                         <div class="fieldWrapper2">
-                            <label for="middle_name">Middle Name</label>
-                            <input class="input" type="text" name="middle_name" maxlength="254" id="middle_name" value="{{voter.middle_name}}" readonly>
+                            <label for="election">Department</label>
+                            <input class="input" type="text" name="election" maxlength="254" id="election" value="{{voter.election}}" readonly>
                         </div>
 
                         <div class="spacer"></div>
@@ -70,47 +70,13 @@
                     </div>
             </div>
         </div>
-        <div class="formWrapper">
-            <div class="form">
-                <p>Location Details</p>
-                    <div class="fieldWrapper_group">
-                        <div class="fieldWrapper2">
-                            <label for="county">County</label>
-                            <input class="input" type="text" name="gender" maxlength="10" id="gender" value="{{voter.ward_code.constituency_code.county_code}}" readonly>
-                        </div>
 
-                        <div class="spacer"></div>
-
-                        <div class="fieldWrapper2">
-                            <label for="constituency">Constituency</label>
-                            <input class="input" type="text" name="gender" maxlength="10" id="gender" value="{{voter.ward_code.constituency_code}}" readonly>
-                        </div>
-                    </div>
-
-                    <div class="fieldWrapper_group">
-                        <div class="fieldWrapper2">
-                            <label for="ward">Ward</label>
-                            <input class="input" type="text" name="ward" maxlength="255" id="ward" value="{{voter.ward_code}}" readonly>
-                        </div>
-                    </div>
-            </div>
-        </div>
-
-        <div class="formWrapper">
-            <div class="form">
-                <div class="fieldWrapper">
-                    <label for="photo">Photo</label>
-                    <img id="output" src="{{ voter.photo.url }}" alt="Loading..."/>
+            <div class="button-parent">
+                <div class="button-group2">
+                    <a class="submit" href={% url 'vote:index' %}>BACK</a>
                 </div>
             </div>
+            </form>
         </div>
-
-                <div class="button-parent">
-                    <div class="button-group2">
-                        <a class="submit" href={% url 'vote:index' %}>BACK</a>
-                    </div>
-                </div>
-                </form>
-            </div>
 
 {% endblock %}
