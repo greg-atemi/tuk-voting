@@ -12,34 +12,45 @@
 
         <div class="content2">
             <div>
-                You Are a Registered Voter
+                Select your preferred candidate
             </div>
         </div>
-
-        <div class="content2">
-            <div>
-                Below are your registration details.
-            </div>
-        </div>
-
+        
         <div class="formWrapper">
             <div class="form">
-                <table class="table-long">
-                    <thead>
-                        <tr class="table-row">
-                            <th class="head-item">NAME</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for candidate in candidate %}
-                        <tr class="table-row">
-                            <td class="cell">{{ candidate.candidate_name }}</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                <form action="{% url 'vote:cast_vote' election.id %}" method="post">
+                    {% csrf_token %}
+                    <fieldset>
+                        <legend><h1>{{ election.election_name }}</h1></legend>
+                        {% if error_message %}
+                            <p><strong>{{ error_message }}</strong></p>
+                        {% endif %}
+                        {% for candidate in election.candidate_set.all %}
+                            <input type="radio" name="candidate" id="candidate{{ candidate.id }}" value="{{ candidate.email_id }}">
+                            <label for="candidate{{ candidate.email_id }}">{{ candidate.first_name }} {{ candidate.surname }}</label><br>
+                        {% endfor %}
+                    </fieldset>
+                    <input type="submit" value="Vote">
+                </form>
             </div>
         </div>
+
+        <!-- <div class="formWrapper">
+            <div class="form">
+                <form action="{% url 'vote:cast_vote' election.id %}" method="post">
+                    {% csrf_token %}
+                    <fieldset>
+                        <legend><h1>{{ election.election_name }}</h1></legend>
+                        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+                        {% for candidate in election.candidate_set.all %}
+                            <input type="radio" name="candidate" id="candidate{{ forloop.counter }}" value="{{ candidate.id }}">
+                            <label for="candidate{{ forloop.counter }}">{{ candidate.first_name }} {{ candidate.surname }}</label><br>
+                        {% endfor %}
+                    </fieldset>
+                    <input type="submit" value="Vote">
+                </form>
+            </div>
+        </div> -->
 
             <div class="button-parent">
                 <div class="button-group2">

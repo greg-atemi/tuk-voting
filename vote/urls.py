@@ -10,6 +10,7 @@ urlpatterns = [
     path('bio', views.bio, name='bio'),
     path('confirmation/<str:registration_number>/', views.confirmation, name='confirmation'),
     path('success', views.success, name='success'),
+    path('success_vote', views.success_vote, name='success_vote'),
     path('dashboard', views.dashboard, name='dashboard'),
     path('voter_list', views.voter_list, name='voter_list'),
     path('create_voter', views.create_voter, name='create_voter'),

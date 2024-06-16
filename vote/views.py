@@ -382,112 +382,81 @@ def ward_list(request):
     return render(request, 'vote/admin/ward_list.html', context)
 
 
+@login_required
 def bio(request):
-    if request.user.is_authenticated:
-        fname = request.user.first_name
-        context = {
-            'fname': fname
-        }
+    elections = Election.objects.all()
+    fname = request.user.first_name
+    if Voter.objects.filter(email=request.user.id):
+        messages.error(request, "You are already registered as a voter!!")
+        return redirect('vote:index')
 
-        if Voter.objects.filter(email=request.user.id):
-            messages.error(request, "You are already registered as a voter!!")
-            return redirect('vote:index')
+    if request.method == "POST":
+        registration_number = request.POST['registration_number']
+        email = request.user.id
+        election_id = request.POST['election']
+        first_name = request.POST['first_name']
+        surname = request.POST['surname']
+        phone_number = request.POST['phone_number']
+        gender = request.POST['gender']
 
-        if request.method == "POST":
-            registration_number = request.POST['registration_number']
-            email = request.user.id
-            first_name = request.POST['first_name']
-            surname = request.POST['surname']
-            phone_number = request.POST['phone_number']
-            gender = request.POST['gender']
+        try:
+            election = Election.objects.get(id=election_id)
+        except Election.DoesNotExist:
+            messages.error(request, "Selected election does not exist.")
+            return redirect('vote:bio')
 
-            myvoter = Voter.objects.create(registration_number=registration_number, email_id=email,
-                                           first_name=first_name, surname=surname,
-                                           phone_number=phone_number, gender=gender)
+        myvoter = Voter.objects.create( registration_number=registration_number, email_id=email, election=election,
+                                        first_name=first_name, surname=surname,phone_number=phone_number, gender=gender)
 
-            myvoter.save()
+        myvoter.save()
+        
+        return redirect('vote:confirmation', registration_number)
+    
+    context = {
+        'elections': elections,
+        'fname': fname
+    }
 
-            return redirect('vote:confirmation', registration_number)
-
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:login')
     return render(request, 'vote/user/bio.html', context)
 
 
-def location(request, id_serial_number):
-    if request.user.is_authenticated:
-        fname = request.user.first_name
-        voter = Voter.objects.get(id_serial_number=id_serial_number)
-        context = {
-            'fname': fname,
-            'voter': voter
-        }
-        if request.method == "POST":
-            id_serial_number = voter.id_serial_number
-            email = request.user.id
-            first_name = voter.first_name
-            middle_name = voter.middle_name
-            surname = voter.surname
-            phone_number = voter.phone_number
-            gender = voter.gender
-            photo = 'user.svg'
-            ward_code = request.POST['ward_code']
+@login_required
+def confirmation(request, registration_number):
+    elections = Election.objects.all()
+    fname = request.user.first_name
+    voter = Voter.objects.get(registration_number=registration_number)
+    context = {
+        'fname': fname,
+        'voter': voter,
+        'elections': elections
+    }
+    if request.method == "POST":
+        registration_number = request.POST['registration_number']
+        email = request.user.id
+        election_id = request.POST['election']
+        first_name = request.POST['first_name']
+        surname = request.POST['surname']
+        phone_number = request.POST['phone_number']
+        gender = voter.gender
 
-            myvoter = Voter(id_serial_number=id_serial_number, email_id=email, first_name=first_name,
-                            middle_name=middle_name, surname=surname, phone_number=phone_number,
-                            gender=gender, photo=photo, ward_code_id=ward_code)
+        try:
+            election = Election.objects.get(id=election_id)
+        except Election.DoesNotExist:
+            messages.error(request, "Selected election does not exist.")
+            return redirect('vote:bio')
 
-            myvoter.save()
+        my_voter = Voter(registration_number=registration_number, email_id=email,
+                         election=election, first_name=first_name, surname=surname,
+                         phone_number=phone_number, gender=gender)
 
-            return redirect('vote:photo', id_serial_number)
+        my_voter.save()
 
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:login')
-
-    return render(request, 'vote/user/location.html', context)
-
-
-def photo(request, id_serial_number):
-    if request.user.is_authenticated:
-        fname = request.user.first_name
-        voter = Voter.objects.get(id_serial_number=id_serial_number)
-        context = {
-            'fname': fname,
-            'voter': voter
-        }
-        if request.method == "POST":
-            id_serial_number = voter.id_serial_number
-            email = request.user.id
-            first_name = voter.first_name
-            middle_name = voter.middle_name
-            surname = voter.surname
-            phone_number = voter.phone_number
-            gender = voter.gender
-
-            try:
-                image = request.FILES['image']
-            except MultiValueDictKeyError:
-                image = voter.photo
-
-            ward_code = voter.ward_code
-
-            my_voter = Voter(id_serial_number=id_serial_number, email_id=email, first_name=first_name,
-                             middle_name=middle_name, surname=surname, phone_number=phone_number,
-                             gender=gender, photo=image, ward_code_id=ward_code)
-
-            my_voter.save()
-
-            return redirect('vote:confirmation', id_serial_number)
-
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:login')
-
-    return render(request, 'vote/user/photo.html', context)
+        return redirect('vote:success')
+        
+    return render(request, 'vote/user/confirmation.html', context)
 
 
+@login_required
 def success(request):
     if request.user.is_authenticated:
         fname = request.user.first_name
@@ -498,33 +467,15 @@ def success(request):
     return render(request, 'vote/user/success.html', context)
 
 
-def confirmation(request, registration_number):
+@login_required
+def success_vote(request):
     if request.user.is_authenticated:
         fname = request.user.first_name
-        voter = Voter.objects.get(registration_number=registration_number)
         context = {
-            'fname': fname,
-            'voter': voter
+            'fname': fname
         }
-        if request.method == "POST":
-            registration_number = request.POST['registration_number']
-            email = request.user.id
-            first_name = request.POST['first_name']
-            surname = request.POST['surname']
-            phone_number = request.POST['phone_number']
-            gender = voter.gender
 
-            my_voter = Voter(registration_number=registration_number, email_id=email, first_name=first_name,
-                            surname=surname, phone_number=phone_number, gender=gender)
-
-            my_voter.save()
-
-            return redirect('vote:success')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:login')
-
-    return render(request, 'vote/user/confirmation.html', context)
+    return render(request, 'vote/user/success_vote.html', context)
 
 
 def create_voter(request):
@@ -629,60 +580,98 @@ def check_details_auth(request):
 
     return render(request, 'vote/user/check_details_auth.html', context)
 
+
+@login_required
 def cast_vote_auth(request):
-    if request.user.is_authenticated:
-        fname = request.user.first_name
+    fname = request.user.first_name
+    context = {
+        'fname': fname
+    }
 
-        context = {
-            'fname': fname
-        }
+    if request.method == "POST":
+        registration_number = request.POST['registration_number']
+        try:
+            voter = Voter.objects.select_related('email__voter').get(registration_number=registration_number)
+        except Voter.DoesNotExist:
+            messages.error(request, "Invalid details, please try again")
+            return redirect('vote:cast_vote_auth')
 
-        if request.method == "POST":
+        email2 = voter.email.email
+        email3 = request.user.email
+        election = voter.election.id
+        status = voter.status
+        
+        if status == True:
+            messages.error(request, "You cannot vote twice!!")
+            return redirect('vote:index')
+        
+        if email2 == email3:
+            return redirect('vote:cast_vote', election)
 
-            registration_number = request.POST['registration_number']
-            try:
-                voter = Voter.objects.select_related('email__voter').get(registration_number=registration_number)
-            except Voter.DoesNotExist:
-                messages.error(request, "Invalid details, please try again")
-                return redirect('vote:check_details_auth')
-
-            email2 = voter.email.email
-            email3 = request.user.email
-            election = voter.election.id
-            
-            if email2 == email3:
-                return redirect('vote:cast_vote', election)
-
-            else:
-                messages.error(request, "Invalid details, please try again")
-                return redirect('vote:check_details_auth')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:login')
+        else:
+            messages.error(request, "Invalid details, please try again")
+            return redirect('vote:cast_vote_auth')
 
     return render(request, 'vote/user/cast_vote_auth.html', context)
 
+
+@login_required
 def cast_vote(request, election_id):
     election = get_object_or_404(Election, pk=election_id)
+    
     try:
-        selected_candidate = election.candidate_set.get(pk=request.POST["candidate"])
-    except (KeyError, Candidate.DoesNotExist):
-        # Redisplay the election voting form.
-        return render(
-            request,
-            'vote/user/cast_vote.html',
-            {
-                "election": election,
-                "error_message": "You didn't select a candidate.",
-            },
-        )
-    else:
-        selected_candidate.votes = F("votes") + 1
+        voter = request.user.voter
+    except Voter.DoesNotExist:
+        messages.error(request, "You are not registered as a voter for this election.")
+        return redirect('vote:index')
+
+    if request.method == "POST":
+        try:
+            id = request.POST["candidate"]
+            selected_candidate = election.candidate_set.get(pk=id)
+        except (KeyError, Candidate.DoesNotExist):
+            # Redisplay the election voting form with an error message
+            messages.error(request, "You didn't select a valid candidate.")
+            return render(request, 'vote/user/cast_vote.html', {"election": election})
+
+        # Increment the vote count for the selected candidate
+        selected_candidate.votes += 1
         selected_candidate.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results", args=(election.id,)))
+
+        # Mark the voter as having voted
+        voter.status = True
+        voter.save()
+
+        # Redirect to the results page or any other page after voting
+        return redirect('vote:success_vote')
+
+    # If not a POST request, render the voting form
+    return render(request, 'vote/user/cast_vote.html', {"election": election})
+
+
+# @login_required
+# def cast_vote(request, election_id):
+#     election = get_object_or_404(Election, pk=election_id)
+
+#     try:
+#         selected_candidate = election.candidate_set.get(pk=request.POST["candidate"])
+#     except (KeyError, Candidate.DoesNotExist):
+#         # Redisplay the election voting form.
+#         return render(
+#             request,
+#             'vote/user/cast_vote.html',
+#             {
+#                 "election": election,
+#                 "error_message": "You didn't select a candidate.",
+#             },
+#         )
+#     else:
+#         selected_candidate.votes = F("votes") + 1
+#         selected_candidate.save()
+#         # Always return an HttpResponseRedirect after successfully dealing
+#         # with POST data. This prevents data from being posted twice if a
+#         # user hits the Back button.
+#         return HttpResponseRedirect(reverse("polls:results", args=(election.id,)))
 
 def voter_details(request, registration_number):
     if request.user.is_authenticated:

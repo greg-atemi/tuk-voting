@@ -39,6 +39,7 @@ class Voter(models.Model):
     first_name = models.CharField(max_length=200)
     surname = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=10)
+    status = models.BooleanField(default=False)
 
     Male = 'Male'
     Female = 'Female'

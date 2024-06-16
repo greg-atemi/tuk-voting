@@ -1,0 +1,26 @@
+{% extends 'vote/user/base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Success</title>
+{% endblock %}
+
+{% block body_block %}
+    <div class="parent">
+        <div class="title">
+            SUCCESS!
+        </div>
+
+        <div class="content">
+            You have successfully voted for your candidate.
+        </div>
+        <div class="content">
+            Await for the voting process to end and get your results
+        </div>
+        <div class="button-container">
+            <a class="submit2" href="/vote">
+                BACK TO HOME SCREEN
+            </a>
+        </div>
+    </div>
+
+{% endblock %}
