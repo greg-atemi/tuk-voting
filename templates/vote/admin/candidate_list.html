@@ -1,7 +1,7 @@
 {% extends 'vote/admin/admin_base.html' %}
 {% load static %}
 {% block title_block %}
-    <title>Voter List</title>
+    <title>Candidate List</title>
 {% endblock %}
 
 {% block body_block %}
@@ -15,20 +15,20 @@
                 <th class="head-item">GENDER</th>
                 <th class="head-item">EMAIL</th>
                 <th class="head-item">DEPARTMENT</th>
-                <th class="head-item">HAS VOTED</th>
+                <th class="head-item">VOTES</th>
 {#                <th class="head-item"></th>#}
             </tr>
         </thead>
         <tbody>
-        {% for voter in voter %}
+        {% for candidate in candidate_list %}
             <tr class="table-row">
-                <td class="cell">{{ voter.registration_number }}</td>
-                <td class="cell">{{ voter.first_name }} {{ voter.surname }}</td>
-                <td class="cell">{{ voter.phone_number }}</td>
-                <td class="cell">{{ voter.gender }}</td>
-                <td class="cell">{{ voter.email }}</td>
-                <td class="cell">{{ voter.election }}</td>
-                <td class="cell">{{ voter.status }}</td>
+                <td class="cell">{{ candidate.registration_number }}</td>
+                <td class="cell">{{ candidate.first_name }} {{ candidate.surname }}</td>
+                <td class="cell">{{ candidate.phone_number }}</td>
+                <td class="cell">{{ candidate.gender }}</td>
+                <td class="cell">{{ candidate.email }}</td>
+                <td class="cell">{{ candidate.election }}</td>
+                <td class="cell">{{ candidate.votes }}</td>
             </tr>
         {% endfor %}
         </tbody>

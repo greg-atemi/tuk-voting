@@ -17,12 +17,11 @@
         </div>
         <div class="content2">
             <div>
-                Please note that providing false information is a crime punishable by law.
+                Some of the fields cannot be updated here. For those kindly contact the admin
             </div>
         </div>
         <div class="formWrapper">
             <div class="form">
-                <p>Personal Details</p>
                 <form action="" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                     <div class="fieldWrapper_group">
@@ -64,6 +63,13 @@
                         <div class="fieldWrapper2">
                             <label for="gender">Gender</label>
                             <input class="input" type="text" name="gender" maxlength="10" id="gender" value="{{voter.gender}}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="fieldWrapper_group">
+                        <div class="fieldWrapper2">
+                            <label for="email">Email Address</label>
+                            <input class="input" type="text" name="email" id="email" value="{{voter.email}}" required>
                         </div>
                     </div>
             </div>

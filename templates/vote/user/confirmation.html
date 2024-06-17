@@ -32,7 +32,6 @@
         <div>
             <div class="formWrapper">
                 <div class="form">
-                    <p>Personal Details</p>
                     <form action="" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="fieldWrapper_group">
@@ -53,6 +52,7 @@
                             <div class="fieldWrapper2">
                                 <label for="election">Department</label>
                                 <select class="input" name="election" id="election" required>
+                                    <option value="">------SELECT YOUR DEPARTMENT------</option>
                                     {% for election in elections %}
                                         <option value="{{ election.id }}">{{ election.election_name }}</option>
                                     {% endfor %}
@@ -78,7 +78,7 @@
                             <div class="fieldWrapper2">
                                 <label for="gender">Gender</label>
                                 <select class="input" name="gender" id="gender" required>
-                                    <option value="" selected=""></option>
+                                    <option value="">------SELECT YOUR DEPARTMENT------</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
                                     <option value="Other">Other</option>

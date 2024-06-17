@@ -1,0 +1,27 @@
+{% extends 'vote/admin/admin_base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Election List</title>
+{% endblock %}
+
+{% block body_block %}
+
+    <table class="table-long">
+        <thead>
+            <tr class="table-row">
+                <th class="head-item">ELECTION NAME</th>
+                <th class="head-item">DATE AND TIME CREATED</th>
+{#                <th class="head-item"></th>#}
+            </tr>
+        </thead>
+        <tbody>
+        {% for election in election_list %}
+            <tr class="table-row">
+                <td class="cell">{{ election.election_name }}</td>
+                <td class="cell">{{ election.pub_date }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+

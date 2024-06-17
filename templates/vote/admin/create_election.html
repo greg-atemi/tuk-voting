@@ -1,0 +1,27 @@
+{% extends 'vote/admin/admin_base.html' %}
+{% load static %}
+{% block title_block %}
+    <title>Create Election</title>
+{% endblock %}
+
+{% block body_block %}
+
+    <form action="" method="post">
+        <div class="form">
+            <p>Create Election</p>
+            {% csrf_token %}
+            <div class="fieldWrapper_group">
+                <div class="fieldWrapper2">
+                    <label for="election_name">Election Name</label>
+                    <input class="input" type="text" name="election_name" maxlength="8" id="election_name" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <input class="submit" type="reset" value="CANCEL CHANGES">
+            <input id="submit2" type="submit" value="SUBMIT"/>
+        </div>
+    </form>
+
+{% endblock %}

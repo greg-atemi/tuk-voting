@@ -212,34 +212,6 @@ def user_account(request):
     return render(request, 'vote/user/user_account.html', context)
 
 
-def county_detail(request):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        context = {
-            'fname': fname,
-            'lname': lname
-        }
-        if request.method == "POST":
-            county_code = request.POST['county_code']
-            county_name = request.POST['county_name']
-
-            mycounty = County.objects.create(county_code=county_code, county_name=county_name)
-            mycounty.county_code = county_code
-            mycounty.county_name = county_name
-
-            mycounty.save()
-
-            messages.success(request, "County added successfully.")
-
-            return redirect('vote:county_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/county_detail.html', context)
-
-
 def admin_account(request):
     if request.user.is_authenticated and request.user.is_staff:
         uname = request.user.username
@@ -259,145 +231,23 @@ def admin_account(request):
     return render(request, 'vote/admin/admin_account.html', context)
 
 
-def county_list(request):
-    if request.user.is_authenticated and request.user.is_staff:
-        county = County.objects.all()
-        fname = request.user.first_name
-        lname = request.user.last_name
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'county': county
-        }
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/county_list.html', context)
-
-
-def constituency_detail(request):
-    if request.user.is_authenticated and request.user.is_staff:
-        county = County.objects.all()
-        fname = request.user.first_name
-        lname = request.user.last_name
-        context = {
-            'county': county,
-            'fname': fname,
-            'lname': lname
-        }
-        if request.method == "POST":
-            constituency_code = request.POST['constituency_code']
-            constituency_name = request.POST['constituency_name']
-            county_code = request.POST['county_code']
-
-            myconstituency = Constituency.objects.create(constituency_code=constituency_code,
-                                                         constituency_name=constituency_name,
-                                                         county_code_id=county_code
-                                                         )
-
-            myconstituency.constituency_code = constituency_code
-            myconstituency.constituency_name = constituency_name
-            myconstituency.county_code_id = county_code
-
-            myconstituency.save()
-
-            messages.success(request, "Constituency added successfully.")
-
-            return redirect('vote:constituency_list')
-
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/constituency_detail.html', context)
-
-
-def constituency_list(request):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        constituency = Constituency.objects.all()
-        context = {
-            'constituency': constituency,
-            'fname': fname,
-            'lname': lname
-        }
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/constituency_list.html', context)
-
-
-def ward_detail(request):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        constituency = Constituency.objects.all()
-        context = {
-            'constituency': constituency,
-            'fname': fname,
-            'lname': lname
-        }
-        if request.method == "POST":
-            ward_code = request.POST['ward_code']
-            ward_name = request.POST['ward_name']
-            constituency_code = request.POST['constituency_code']
-
-            myward = Ward.objects.create(ward_code=ward_code,
-                                         ward_name=ward_name,
-                                         constituency_code_id=constituency_code
-                                         )
-
-            myward.ward_code = ward_code
-            myward.ward_name = ward_name
-            myward.constituency_code_id = constituency_code
-
-            myward.save()
-
-            return redirect('vote:ward_list')
-
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/ward_detail.html', context)
-
-
-def ward_list(request):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        ward = Ward.objects.all()
-        context = {
-            'ward': ward,
-            'fname': fname,
-            'lname': lname
-        }
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/ward_list.html', context)
-
-
 @login_required
 def bio(request):
     elections = Election.objects.all()
     fname = request.user.first_name
-    if Voter.objects.filter(email=request.user.id):
+    if Voter.objects.filter(user=request.user.id):
         messages.error(request, "You are already registered as a voter!!")
         return redirect('vote:index')
 
     if request.method == "POST":
         registration_number = request.POST['registration_number']
-        email = request.user.id
+        user = request.user
         election_id = request.POST['election']
         first_name = request.POST['first_name']
         surname = request.POST['surname']
         phone_number = request.POST['phone_number']
         gender = request.POST['gender']
+        email = request.user.email
 
         try:
             election = Election.objects.get(id=election_id)
@@ -405,7 +255,7 @@ def bio(request):
             messages.error(request, "Selected election does not exist.")
             return redirect('vote:bio')
 
-        myvoter = Voter.objects.create( registration_number=registration_number, email_id=email, election=election,
+        myvoter = Voter.objects.create( registration_number=registration_number, user=user, election=election, email=email,
                                         first_name=first_name, surname=surname,phone_number=phone_number, gender=gender)
 
         myvoter.save()
@@ -432,12 +282,13 @@ def confirmation(request, registration_number):
     }
     if request.method == "POST":
         registration_number = request.POST['registration_number']
-        email = request.user.id
+        user = request.user
         election_id = request.POST['election']
         first_name = request.POST['first_name']
         surname = request.POST['surname']
         phone_number = request.POST['phone_number']
         gender = voter.gender
+        email = request.user.email
 
         try:
             election = Election.objects.get(id=election_id)
@@ -445,9 +296,8 @@ def confirmation(request, registration_number):
             messages.error(request, "Selected election does not exist.")
             return redirect('vote:bio')
 
-        my_voter = Voter(registration_number=registration_number, email_id=email,
-                         election=election, first_name=first_name, surname=surname,
-                         phone_number=phone_number, gender=gender)
+        my_voter = Voter(registration_number=registration_number, user=user, election=election, first_name=first_name,
+                         surname=surname, email=email, phone_number=phone_number, gender=gender)
 
         my_voter.save()
 
@@ -511,6 +361,74 @@ def create_voter(request):
     return render(request, 'vote/admin/create_voter.html', context)
 
 
+@login_required
+def create_candidate(request):
+    if request.user.is_staff:
+        fname = request.user.first_name
+        lname = request.user.last_name
+        elections = Election.objects.all()
+        context = {
+            'fname': fname,
+            'lname': lname,
+            'election_list' : elections
+        }
+
+        if request.method == "POST":
+            election_id = request.POST['election']
+            registration_number = request.POST['registration_number']
+            first_name = request.POST['first_name']
+            surname = request.POST['surname']
+            phone_number = request.POST['phone_number']
+            gender = request.POST['gender']
+
+            try:
+                election = Election.objects.get(id=election_id)
+            except Election.DoesNotExist:
+                messages.error(request, "Selected election does not exist.")
+                return redirect('vote:bio')
+
+
+            mycandidate = Candidate.objects.create( registration_number=registration_number, first_name=first_name,
+                                                    election=election, surname=surname, phone_number=phone_number, gender=gender)
+
+            mycandidate.save()
+
+            messages.success(request, "Voter added successfully.")
+
+            return redirect('vote:candidate_list')
+    else:
+        messages.info(request, "Login to continue")
+        return redirect('vote:login')
+
+    return render(request, 'vote/admin/create_candidate.html', context)
+
+
+@login_required
+def create_election(request):
+    if request.user.is_staff:
+        fname = request.user.first_name
+        lname = request.user.last_name
+        context = {
+            'fname': fname,
+            'lname': lname
+        }
+        if request.method == "POST":
+            election_name = request.POST['election_name']
+
+            myelection = Election.objects.create(election_name=election_name)
+
+            myelection.save()
+
+            messages.success(request, "Election added successfully.")
+
+            return redirect('vote:election_list')
+    else:
+        messages.info(request, "Login to continue")
+        return redirect('vote:login')
+
+    return render(request, 'vote/admin/create_election.html', context)
+
+
 def voter_list(request):
     if request.user.is_authenticated and request.user.is_staff:
         fname = request.user.first_name
@@ -529,14 +447,34 @@ def voter_list(request):
 
     return render(request, 'vote/admin/voter_list.html', context)
 
+
+def election_list(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        fname = request.user.first_name
+        lname = request.user.last_name
+        elections = Election.objects.all()
+        user = User.objects.all()
+        context = {
+            'election_list': elections,
+            'user': user,
+            'fname': fname,
+            'lname': lname
+        }
+    else:
+        messages.info(request, "Login to continue")
+        return redirect('vote:login')
+
+    return render(request, 'vote/admin/election_list.html', context)
+
+
 def candidate_list(request):
     if request.user.is_authenticated and request.user.is_staff:
         fname = request.user.first_name
         lname = request.user.last_name
-        voter = Voter.objects.all()
+        candidate = Candidate.objects.all()
         user = User.objects.all()
         context = {
-            'voter': voter,
+            'candidate_list': candidate,
             'user': user,
             'fname': fname,
             'lname': lname
@@ -560,12 +498,12 @@ def check_details_auth(request):
 
             registration_number = request.POST['registration_number']
             try:
-                voter = Voter.objects.select_related('email__voter').get(registration_number=registration_number)
+                voter = Voter.objects.select_related('user__voter').get(registration_number=registration_number)
             except Voter.DoesNotExist:
                 messages.error(request, "Invalid details, please try again")
                 return redirect('vote:check_details_auth')
 
-            email2 = voter.email.email
+            email2 = voter.user.email
             email3 = request.user.email
 
             if email2 == email3:
@@ -591,27 +529,25 @@ def cast_vote_auth(request):
     if request.method == "POST":
         registration_number = request.POST['registration_number']
         try:
-            voter = Voter.objects.select_related('email__voter').get(registration_number=registration_number)
+            voter = Voter.objects.select_related('user__voter').get(registration_number=registration_number)
         except Voter.DoesNotExist:
             messages.error(request, "Invalid details, please try again")
             return redirect('vote:cast_vote_auth')
 
-        email2 = voter.email.email
+        email2 = voter.user.email
         email3 = request.user.email
         election = voter.election.id
         status = voter.status
         
-        if status == True:
-            messages.error(request, "You cannot vote twice!!")
-            return redirect('vote:index')
-        
-        if email2 == email3:
-            return redirect('vote:cast_vote', election)
-
-        else:
+        if email2 != email3:
             messages.error(request, "Invalid details, please try again")
             return redirect('vote:cast_vote_auth')
-
+        elif status == True:
+            messages.error(request, "You cannot vote twice!!")
+            return redirect('vote:index')
+        else:
+            return redirect('vote:cast_vote', election)          
+        
     return render(request, 'vote/user/cast_vote_auth.html', context)
 
 
@@ -649,34 +585,10 @@ def cast_vote(request, election_id):
     return render(request, 'vote/user/cast_vote.html', {"election": election})
 
 
-# @login_required
-# def cast_vote(request, election_id):
-#     election = get_object_or_404(Election, pk=election_id)
-
-#     try:
-#         selected_candidate = election.candidate_set.get(pk=request.POST["candidate"])
-#     except (KeyError, Candidate.DoesNotExist):
-#         # Redisplay the election voting form.
-#         return render(
-#             request,
-#             'vote/user/cast_vote.html',
-#             {
-#                 "election": election,
-#                 "error_message": "You didn't select a candidate.",
-#             },
-#         )
-#     else:
-#         selected_candidate.votes = F("votes") + 1
-#         selected_candidate.save()
-#         # Always return an HttpResponseRedirect after successfully dealing
-#         # with POST data. This prevents data from being posted twice if a
-#         # user hits the Back button.
-#         return HttpResponseRedirect(reverse("polls:results", args=(election.id,)))
-
 def voter_details(request, registration_number):
     if request.user.is_authenticated:
         fname = request.user.first_name
-        voter = Voter.objects.select_related('email__voter').get(registration_number=registration_number)
+        voter = Voter.objects.select_related('user__voter').get(registration_number=registration_number)
         myvoter = voter.gender
         context = {
             'fname': fname,
@@ -703,12 +615,12 @@ def update_details_auth(request):
 
             registration_number = request.POST['registration_number']
             try:
-                voter = Voter.objects.select_related('email__voter').get(registration_number=registration_number)
+                voter = Voter.objects.select_related('user__voter').get(registration_number=registration_number)
             except Voter.DoesNotExist:
                 messages.error(request, "Invalid details, please try again")
                 return redirect('vote:update_details_auth')
 
-            email2 = voter.email.email
+            email2 = voter.user.email
             email3 = request.user.email
 
             if email2 == email3:
@@ -727,34 +639,23 @@ def update_details_auth(request):
 def update_details(request, registration_number):
     if request.user.is_authenticated:
         fname = request.user.first_name
-        # election = request.user.election
         voter = Voter.objects.get(registration_number=registration_number)
         context = {
             'fname': fname,
             'voter': voter
         }
         if request.method == "POST":
-            try:
-                registration_number = voter.registration_number
-                election = voter.election
-                email = request.user.id
-                first_name = voter.first_name
-                surname = voter.surname
-                phone_number = request.POST['phone_number']
-                gender = voter.gender
+            registration_number = voter.registration_number
+            election = voter.election
+            user = request.user
+            first_name = voter.first_name
+            surname = voter.surname
+            phone_number = request.POST['phone_number']
+            email = request.POST['email']
+            gender = voter.gender
 
-            except MultiValueDictKeyError:
-                registration_number = voter.registration_number
-                email = request.user.id
-                election = voter.election
-                first_name = voter.first_name
-                surname = voter.surname
-                phone_number = request.POST['phone_number']
-                gender = voter.gender
-
-            my_voter = Voter(election = election,registration_number=registration_number,
-                             email_id=email,first_name=first_name,surname=surname,
-                             phone_number=phone_number, gender=gender)
+            my_voter = Voter(election=election, registration_number=registration_number, user=user, email=email,
+                             first_name=first_name, surname=surname, phone_number=phone_number, gender=gender)
 
             my_voter.save()
 

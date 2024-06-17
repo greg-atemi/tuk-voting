@@ -26,8 +26,8 @@
                             <p><strong>{{ error_message }}</strong></p>
                         {% endif %}
                         {% for candidate in election.candidate_set.all %}
-                            <input type="radio" name="candidate" id="candidate{{ candidate.id }}" value="{{ candidate.email_id }}">
-                            <label for="candidate{{ candidate.email_id }}">{{ candidate.first_name }} {{ candidate.surname }}</label><br>
+                            <input type="radio" name="candidate" id="candidate{{ candidate.id }}" value="{{ candidate.id }}">
+                            <label for="candidate{{ candidate.id }}">{{ candidate.first_name }} {{ candidate.surname }}</label><br>
                         {% endfor %}
                     </fieldset>
                     <input type="submit" value="Vote">
