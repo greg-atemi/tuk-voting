@@ -35,29 +35,11 @@
             </div>
         </div>
 
-        <!-- <div class="formWrapper">
-            <div class="form">
-                <form action="{% url 'vote:cast_vote' election.id %}" method="post">
-                    {% csrf_token %}
-                    <fieldset>
-                        <legend><h1>{{ election.election_name }}</h1></legend>
-                        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-                        {% for candidate in election.candidate_set.all %}
-                            <input type="radio" name="candidate" id="candidate{{ forloop.counter }}" value="{{ candidate.id }}">
-                            <label for="candidate{{ forloop.counter }}">{{ candidate.first_name }} {{ candidate.surname }}</label><br>
-                        {% endfor %}
-                    </fieldset>
-                    <input type="submit" value="Vote">
-                </form>
+        <div class="button-parent">
+            <div class="button-group2">
+                <a class="submit" href={% url 'vote:index' %}>BACK</a>
             </div>
-        </div> -->
-
-            <div class="button-parent">
-                <div class="button-group2">
-                    <a class="submit" href={% url 'vote:index' %}>BACK</a>
-                </div>
-            </div>
-            </form>
         </div>
+    </div>
 
 {% endblock %}

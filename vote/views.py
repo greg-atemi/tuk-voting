@@ -53,57 +53,14 @@ def signup(request):
             messages.error(request, "Passwords do not match")
             return redirect('vote:signup')
 
-        # if not pass1.isalnum():
-        #     messages.error(request, "Password must contain both letters and numbers")
-        #     return redirect('vote:signup')
-
-        # if len(pass1) < 7:
-        #     messages.error(request, "Password must contain at least 8 characters")
-        #     return redirect('vote:signup')
-
         myuser = User.objects.create_user(username, email, pass1)
         myuser.first_name = fname
         myuser.last_name = lname
-        # myuser.is_active = False
         myuser.is_active = True
 
         myuser.save()
 
         messages.success(request, "Your Account has been created successfully. \n ")
-        messages.success(request, "We have sent you a confirmation link to your email. \n ")
-        messages.success(request, "Please click on it to activate your account. \n ")
-
-        # Welcome Email
-
-        # subject = "Welcome to Kura Electronic Voter Registration System"
-        # message = "Hello " + myuser.first_name + "\n Welcome to Kura Electronic Voter Registration System| \n Thank " \
-        #                                          "you for visiting our website \n We have sent you a confirmation " \
-        #                                          "email, please confirm your email address in order to activate your " \
-        #                                          "account. \n\n Thank You \n Greg Atemi "
-        # from_email = settings.EMAIL_HOST_USER
-        # to_list = [
-        #     myuser.email
-        # ]
-        # send_mail(subject, message, from_email, to_list, fail_silently=True)
-
-        # # Email Address Confirmation Email
-
-        # current_site = get_current_site(request)
-        # email_subject = "Confirm your email"
-        # message2 = render_to_string("vote/auth/email_confirmation.html", {
-        #     'name': myuser.first_name,
-        #     'domain': current_site.domain,
-        #     'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
-        #     'token': generate_token.make_token(myuser)
-        # })
-        # email = EmailMessage(
-        #     email_subject,
-        #     message2,
-        #     settings.EMAIL_HOST_USER,
-        #     [myuser.email],
-        # )
-        # email.fail_silently = False
-        # email.send()
 
         return redirect('vote:login')
 
@@ -378,6 +335,7 @@ def create_candidate(request):
             registration_number = request.POST['registration_number']
             first_name = request.POST['first_name']
             surname = request.POST['surname']
+            email = request.POST['email']
             phone_number = request.POST['phone_number']
             gender = request.POST['gender']
 
@@ -388,7 +346,7 @@ def create_candidate(request):
                 return redirect('vote:bio')
 
 
-            mycandidate = Candidate.objects.create( registration_number=registration_number, first_name=first_name,
+            mycandidate = Candidate.objects.create( registration_number=registration_number, first_name=first_name, email=email,
                                                     election=election, surname=surname, phone_number=phone_number, gender=gender)
 
             mycandidate.save()
@@ -471,10 +429,25 @@ def candidate_list(request):
     if request.user.is_authenticated and request.user.is_staff:
         fname = request.user.first_name
         lname = request.user.last_name
-        candidate = Candidate.objects.all()
         user = User.objects.all()
+        elections = Election.objects.all()
+        selected_election = request.GET.get('selected_election')
+
+        sort_by = request.GET.get('sort_by', 'votes')
+        order = request.GET.get('order', 'desc')
+
+        if order == 'desc':
+            sort_by = '-' + sort_by
+        
+        if selected_election:
+            candidate = Candidate.objects.filter(election_id=selected_election).order_by(sort_by)
+        else:
+            candidate = Candidate.objects.all().order_by(sort_by)
+        
         context = {
             'candidate_list': candidate,
+            'election_list': elections,
+            'selected_election': selected_election,
             'user': user,
             'fname': fname,
             'lname': lname
@@ -666,152 +639,3 @@ def update_details(request, registration_number):
         return redirect('vote:login')
 
     return render(request, 'vote/user/update_details.html', context)
-
-
-def update_county(request, county_code):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        county = County.objects.get(county_code=county_code)
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'county': county
-        }
-
-        if request.method == "POST":
-            code = request.POST['county_code']
-            name = request.POST['county_name']
-
-            mycounty = County(county_code=code, county_name=name)
-            mycounty.save()
-
-            return redirect('vote:county_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/update_county.html', context)
-
-
-def delete_county(request, county_code):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        county = County.objects.get(county_code=county_code)
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'county': county
-        }
-
-        if request.method == "POST":
-            county.delete()
-            return redirect('vote:county_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/delete_county.html', context)
-
-
-def update_constituency(request, constituency_code):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        list_of_counties = County.objects.all
-        constituency = Constituency.objects.get(constituency_code=constituency_code)
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'constituency': constituency,
-            'list_of_counties': list_of_counties
-        }
-
-        if request.method == "POST":
-            code = request.POST['constituency_code']
-            name = request.POST['constituency_name']
-            county_code = request.POST['county_code']
-            county = County.objects.get(county_code=county_code)
-
-            myconstituency = Constituency(constituency_code=code, constituency_name=name, county_code=county)
-            myconstituency.save()
-
-            return redirect('vote:constituency_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/update_constituency.html', context)
-
-
-def delete_constituency(request, constituency_code):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        constituency = Constituency.objects.get(constituency_code=constituency_code)
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'constituency': constituency
-        }
-
-        if request.method == "POST":
-            constituency.delete()
-            return redirect('vote:constituency_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/delete_constituency.html', context)
-
-
-def update_ward(request, ward_code):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        list_of_constituencies = Constituency.objects.all
-        ward = Ward.objects.get(ward_code=ward_code)
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'ward': ward,
-            'list_of_constituencies': list_of_constituencies
-        }
-
-        if request.method == "POST":
-            code = request.POST['ward_code']
-            name = request.POST['ward_name']
-            constituency_code = request.POST['constituency_code']
-            constituency = Constituency.objects.get(constituency_code=constituency_code)
-
-            myward = Ward(ward_code=code, ward_name=name, constituency_code=constituency)
-            myward.save()
-
-            return redirect('vote:ward_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/update_ward.html', context)
-
-
-def delete_ward(request, ward_code):
-    if request.user.is_authenticated and request.user.is_staff:
-        fname = request.user.first_name
-        lname = request.user.last_name
-        ward = Ward.objects.get(ward_code=ward_code)
-        context = {
-            'fname': fname,
-            'lname': lname,
-            'ward': ward
-        }
-
-        if request.method == "POST":
-            ward.delete()
-            return redirect('vote:ward_list')
-    else:
-        messages.info(request, "Login to continue")
-        return redirect('vote:admin_login')
-
-    return render(request, 'vote/admin/delete_ward.html', context)

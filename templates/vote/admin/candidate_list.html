@@ -6,6 +6,20 @@
 
 {% block body_block %}
 
+    <div>
+        <form method="get" style="margin-left: 40px;">
+            <label for="selected_election">Select Election:</label>
+            <select id="selected_election" class="input" name="selected_election" onchange="this.form.submit()">
+                <option value="">ALL ELECTIONS</option>
+                {% for election in election_list %}
+                    <option value="{{ election.id }}" {% if selected_election == election.id|stringformat:"s" %}selected{% endif %}>
+                        {{ election.election_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
     <table class="table-long">
         <thead>
             <tr class="table-row">
@@ -16,7 +30,6 @@
                 <th class="head-item">EMAIL</th>
                 <th class="head-item">DEPARTMENT</th>
                 <th class="head-item">VOTES</th>
-{#                <th class="head-item"></th>#}
             </tr>
         </thead>
         <tbody>
@@ -33,4 +46,5 @@
         {% endfor %}
         </tbody>
     </table>
+
 {% endblock %}

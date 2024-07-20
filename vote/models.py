@@ -27,6 +27,7 @@ class Candidate(models.Model):
         (Female, 'Female'),
         (Other, 'Other'),
     ]
+
     gender = models.CharField(max_length=50, choices=GENDER_CHOICES)
 
     def __str__(self):
@@ -50,6 +51,7 @@ class Voter(models.Model):
         (Female, 'Female'),
         (Other, 'Other'),
     ]
+
     gender = models.CharField(max_length=50, choices=GENDER_CHOICES)
 
     def __str__(self):
