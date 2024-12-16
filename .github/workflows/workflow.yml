@@ -25,7 +25,11 @@ jobs:
       - name: Build image
         run: |
           docker build . -t gregatemi/tuk:v1
-            
-    #   - name: Publish image
-    #     run: |
-    #       docker push gregatemi/tuk:v1
+
+      - name: Docker Login
+        run: |
+          echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
+
+      - name: Publish image
+        run: |
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/tuk:v1
